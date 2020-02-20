@@ -6,4 +6,4 @@ def draw(img):
     cv2.destroyAllWindows()
 
 def draw_bounds(img, mask):
-    pass
+    print('Balls')
