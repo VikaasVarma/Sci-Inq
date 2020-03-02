@@ -12,3 +12,10 @@ def fourier_sharpness(img):
 def canny_sharpness(img):
     edges = cv2.Canny(img, 100, 200)
     return np.count_nonzero(edges)/edges.size  #proportion of pixels that are defined as an edge
+
+def brightness(img):
+    pixelbrightness = 0
+    for x in img:
+        for y in x:
+            pixelbrightness += (y[0]+y[1]+y[2])          
+    return  pixelbrightness/(3*(len(img)*len(img[0])))
