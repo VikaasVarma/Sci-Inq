@@ -26,7 +26,7 @@ class Data(object):
         try:
             os.chdir(self.path)
         except FileNotFoundError:
-            print('Invalid path')
+            print('Invalid path to Data Files')
 
     def get_data(self, path, n = -1):
         with open('.\\Data\\' + path + '.json') as js:
