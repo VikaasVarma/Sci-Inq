@@ -1,7 +1,11 @@
 import numpy as np
 
-def IoU(y, pred):
-    return np.count_nonzero(y | pred == 0) / np.count_nonzero(y | pred)
+def IoU(ys, preds):
+    intersection = union = 0
+    for i in range(len(ys)):
+        intersection += np.count_nonzero(ys[i] | preds[i] == 0)
+        union += np.count_nonzero(ys[i] | preds[i])
+    return intersection / union
 
-def confusion_matrix(y, pred, threshold):
+def confusion_matrix(ys, preds, threshold):
     pass
