@@ -19,3 +19,6 @@ def brightness(img):
         for y in x:
             pixelbrightness += (y[0]+y[1]+y[2])          
     return  pixelbrightness/(3*(len(img)*len(img[0])))
+
+def weather(img):
+    pass

@@ -1,7 +1,6 @@
 import numpy as np
-import cv2
-import os
-import json
+import pandas as pd
+import cv2, os, json
 from tqdm import tqdm
 
 class Data(object):
@@ -45,7 +44,11 @@ class Data(object):
                 self.y[i] = y
 
     def get_train(self, n = -1):
+        if (self.y and len(self.y) > n):
+            return
         self.get_data("train", n)
     
     def get_val(self, n = -1):
+        if (self.y and len(self.y) > n):
+            return
         self.get_data("val", n)
