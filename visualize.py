@@ -1,5 +1,7 @@
 import cv2
 import numpy as np
+from PIL import Image
+from transforms import RGBTransform
 
 
 def create_mask():
@@ -18,14 +20,17 @@ def draw_bounds(img, mask):
     cv2.destroyAllWindows()
 
 
-def iterate():
+def iterate(img):
     a = [[1, 2, 3], [4, 5, 6]]
     b = np.array(a)
     for x in xrange(b.shape[0]):
         for y in yrange(b.shape[1]):
-            if b[x][y] == 1: img[x][y][1] += 30
-            if b[x][y] == 2: img[x][y][0] += 30
-            if b[x][y] == 3: img[x][y][2] += 30
+            if b[x][y] == 1:
+                img[x][y][1] += 30
+            if b[x][y] == 2:
+                img[x][y][0] += 30
+            if b[x][y] == 3:
+                img[x][y][2] += 30
             if b[x][y] == 4:
                 img[x][y][0] += 30
                 img[x][y][1] += 30
@@ -35,17 +40,16 @@ def iterate():
             if b[x][y] == 6:
                 img[x][y][1] += 30
                 img[x][y][2] += 30
-            #if b[x][y] == 7:
+            # if b[x][y] == 7:
 
 
 def test():
-    img = cv2.imread('test\\ting.jfif')
-    hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    hsv_img[100:300,000:600,0] += 75
-    tint_img = cv2.cvtColor(hsv_img, cv2.COLOR_HSV2BGR)
-    cv2.imshow('image', tint_img)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    pic = Image.open('test\\ting.jfif')
+    editpic = pic.crop((200, 100, 300, 300))
+    red = RGBTransform().mix_with((255, 0, 0), factor=.30).applied_to(editpic)
+    pic.paste(red, (200, 100))
+    pic.show()
+
 
 test()
 # 'car': 1,
