@@ -39,14 +39,15 @@ def iterate():
 
 
 def test():
-    img = cv2.imread('ting.jfif')
-    for y in range(200, 500):
-        for x in range(300, 600):
-            img[x][y][0] += 75
-    cv2.imshow('image', img)
+    img = cv2.imread('test\\ting.jfif')
+    hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    hsv_img[100:300,000:600,0] += 75
+    tint_img = cv2.cvtColor(hsv_img, cv2.COLOR_HSV2BGR)
+    cv2.imshow('image', tint_img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
+test()
 # 'car': 1,
 # 'person': 2,
 # 'rider': 3,
@@ -57,3 +58,4 @@ def test():
 # 'traffic light': 8,
 # 'train': 9,
 # 'traffic sign': 10,
+# https://www.youtube.com/watch?v=CCOXg75HkvM
