@@ -1,22 +1,27 @@
 import numpy as np
 import pandas as pd
-import cv2, os, json
+import cv2, os, json, ijson
 from tqdm import tqdm
+
+path = "D:\\Documents\\Sci-Inq"
 
 class Data(object):
 
-    def __init__(self, path = "C:\\Users\\myeditha20\\Documents"):
-        self.labels = {'car' : 1,
-                       'person' : 2,
-                       'rider' : 3,
-                       'bus' : 4,
-                       'bike' : 5,
-                       'motor' : 6,
-                       'truck' : 7,
-                       'traffic light' : 8,
-                       'train' : 9,
-                       'traffic sign' : 10,
-                      }
+    def __init__(self, path = path):
+        self.labels = {
+            '' : 0,
+            'car' : 1,
+            'person' : 2,
+            'rider' : 3,
+            'bus' : 4,
+            'bike' : 5,
+            'motor' : 6,
+            'truck' : 7,
+            'traffic light' : 8,
+            'train' : 9,
+            'traffic sign' : 10,
+            }
+
         self.path = path
         self.x = np.array(int)
         self.y = np.array(int)
@@ -27,28 +32,40 @@ class Data(object):
         except FileNotFoundError:
             print('Invalid path to Data Files')
 
-    def get_data(self, path, n = -1):
-        with open('.\\Data\\' + path + '.json') as js:
-            print("Loading json ...")
-            d = json.load(js)
-            if n == -1: n = len(d)
-            self.x = np.zeros((n, *self.shape, 3))
-            self.y = np.zeros((n, *self.shape))
-            for i in tqdm(range(n)):
-                self.x[i] = cv2.imread(".\\Data\\" + path + "\\" + d[i]['name'])
-                y = np.zeros(self.shape)
-                for j in d[i]['labels']:
-                    if j['category'] in self.labels.keys():
-                        bounds = dict(map(lambda kv: (kv[0], int(kv[1])), j['box2d'].items()))
-                        y[bounds['y1']:bounds['y2'], bounds['x1']:bounds['x2']] = self.labels[j['category']]
-                self.y[i] = y
+    def get_data(self, path, start = 0, end = 100):
+        parser = ijson.parse(open('.\\Data\\' + path + '.json'))
+        i = 0
+        self.x = np.zeros((end - start, *self.shape, 3))
+        self.y = np.zeros((end - start, *self.shape))
+        category = ''
+        bounds = {'x1' : 0, 'x2' : 0, 'y1' : 0, 'y2' : 0}
+        with tqdm(total = end - start) as pbar:
+            for prefix, event, value in parser:
+                if i == end:
+                    break
+                if prefix == "item" and event == "end_map":
+                    i += 1
+                    pbar.update(0 if i < start else 1)
+                if i < start:
+                    continue
 
-    def get_train(self, n = -1):
-        if (self.y and len(self.y) > n):
-            return
-        self.get_data("train", n)
+                
+                if prefix == "item.name" and event == "string":
+                    self.x[i - start] = cv2.imread(".\\Data\\" + path + "\\" + value)
+                    y = np.zeros(self.shape)
+                if prefix == "item.labels.item.category":
+                    category = value
+                if "box2d" in prefix and event == "number":
+                    bounds[prefix[-2:]] = int(value)
+                if prefix == "item.labels.item" and event == "end_map":
+                    if category not in self.labels.keys():
+                        continue
+                    y[bounds['y1']:bounds['y2'], bounds['x1']:bounds['x2']] = self.labels[category]
+                if prefix == "item.labels" and event == "end_array":
+                    self.y[i - start] = y
+
+    def get_train(self, start = 0, end = 100):
+        self.get_data("train", start, end)
     
-    def get_val(self, n = -1):
-        if (self.y and len(self.y) > n):
-            return
-        self.get_data("val", n)
+    def get_val(self, start = 0, end = 100):
+        self.get_data("val", start, end)
