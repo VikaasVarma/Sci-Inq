@@ -46,10 +46,10 @@ def tint(x, y, x1, y1, color, img):
     tinted = RGBTransform().mix_with(
         color, factor=.30).applied_to(pic.crop((x, y, x1, y1)))
     pic.paste(tinted, (x, y))
-    #pic.show()
+    # pic.show()
     return pic
 
-#tint(0, 200, 300, 500, (255, 0, 0), 'test\\ting.jfif')
+# tint(0, 200, 300, 500, (255, 0, 0), 'test\\ting.jfif')
 # 'car': 1,
 # 'person': 2,
 # 'rider': 3,
