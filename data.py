@@ -5,7 +5,7 @@ from test.models.research.object_detection.utils import dataset_util
 import cv2, os, json, ijson
 from tqdm import tqdm
 
-path = "D:\\Documents\\Sci-Inq"
+path = "D:\\se2\\Sci-Inq"
 
 class Data(object):
 
@@ -36,7 +36,7 @@ class Data(object):
         except FileNotFoundError:
             print('Invalid path to Data Files')
 
-    def get_data(self, path, start = 0, end = 100):
+    def get_data(self, path, start, end):
         parser = ijson.parse(open('.\\Data\\' + path + '.json'))
         i = 0
         self.x = np.zeros((end - start, *self.shape, 3))
