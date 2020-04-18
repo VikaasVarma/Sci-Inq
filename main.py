@@ -5,4 +5,6 @@ from data import Data
 from visualize import *
 
 d = Data()
-d.get_train(100)
+
+for i in range(12):
+    d.create_tf_example('image_classes', category = 'class{0}'.format(i))
