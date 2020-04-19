@@ -6,7 +6,7 @@ with warnings.catch_warnings():
     from algos import *
     import pandas as pd
     import numpy as np
-    import os, time
+    import os, time, shutil
     from data import Data
     from tqdm import tqdm
     from functools import partial
@@ -97,5 +97,73 @@ def ensemble(batch_size, total = -1, n_threads = 1):
     for i, c in enumerate(df):
         c.to_csv('image_classes/class_new' + str(i) + '.csv')
 
+
+def thread2(start, end, thread_num, batch_size, total, n_threads):
+    data = Data()
+    with tqdm(total = end - start, desc = "Ensembling {0}".format(thread_num)) as pbar:
+        for j in range((end - start) // batch_size + 1):
+            data.get_data('train', start + j * batch_size, start + (j + 1) * batch_size if start + (j + 1) * batch_size < end else end)
+            for i, img in enumerate(data.x):
+                stats = [brightness(img), fourier_sharpness(img), canny_sharpness(img.astype(np.uint8))]
+                if -1 in stats:
+                    print("Failed at index {0} in batch {1}".format(i, j))
+                    errors.append(i, j)
+                    continue
+                k = None
+                if stats[0] < 0.203:
+                    if stats[1] < 0.172:
+                        if stats[2] < 0.0434:
+                            k = 0
+                        else:
+                            k = 1
+                    else:
+                        if stats[2] < 0.0434:
+                            k = 2
+                        else:
+                            k = 3
+                if stats[0] > 0.203 and stats[0] < 0.382:
+                    if stats[1] < 0.172:
+                        if stats[2] < 0.0434:
+                            k = 4
+                        else:
+                            k = 5
+                    else:
+                        if stats[2] < 0.0434:
+                            k = 6
+                        else:
+                            k = 7
+                if stats[0] > 0.382:
+                    if stats[1] < 0.172:
+                        if stats[2] < 0.0434:
+                            k = 8
+                        else:
+                            k = 9
+                    else:
+                        if stats[2] < 0.0434:
+                            k = 10
+                        else:
+                            k = 11
+                
+                shutil.copy('Data\\train\\' + data.names[i], 'classes\\class{0}'.format(k))
+                pbar.update(1)
+
+
+def ensemble2(batch_size, total = -1, n_threads = 1):
+    if total == -1:
+        total = 7000
+
+    threads = []
+    for i in range(n_threads):
+        start = int(i / n_threads * total)
+        end = int((i + 1) / n_threads * total)
+        threads.append(Process(target = partial(thread2, batch_size = batch_size, total = total, n_threads = n_threads), args = (start, end, i)))
+
+    for i in threads:
+        i.start()
+
+    for i in threads:
+        i.join()
+
 if __name__ == '__main__':
-    ensemble(400, 70000, n_threads = 2)
+    ensemble2(10, 70, n_threads = 7)
+    
